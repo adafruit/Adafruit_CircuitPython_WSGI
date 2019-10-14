@@ -64,7 +64,6 @@ class WSGIApp:
         Return a single item list with the item being your response data string.
         """
 
-        self._start_response = start_response
         status = ""
         headers = []
         resp_data = []
@@ -73,7 +72,7 @@ class WSGIApp:
         if key in self._listeners:
             status, headers, resp_data = self._listeners[key](environ)
 
-        self._start_response(status, headers)
+        start_response(status, headers)
         return resp_data
 
     def on_request(self, method, path, request_handler):
@@ -94,4 +93,3 @@ class WSGIApp:
 
     def _get_listener_key(self, method, path): # pylint: disable=no-self-use
         return "{0}|{1}".format(method.lower(), path)
-
