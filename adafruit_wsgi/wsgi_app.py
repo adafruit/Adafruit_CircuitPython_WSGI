@@ -24,7 +24,11 @@
 ================================================================================
 
 CircuitPython framework for creating WSGI server compatible web applications.
-This does *not* include server implementation, and must 
+This does *not* include server implementation, which is necessary in order
+to create a web application with this library.
+
+* Circuit Python implementation of an WSGI Server for ESP32 devices:
+  https://github.com/adafruit/Adafruit_CircuitPython_ESP32SPI.git
 
 
 * Author(s): Matthew Costi
@@ -32,20 +36,11 @@ This does *not* include server implementation, and must
 Implementation Notes
 --------------------
 
-**Hardware:**
-
-.. todo:: Add links to any specific hardware product page(s), or category page(s). Use unordered list & hyperlink rST
-   inline format: "* `Link Text <url>`_"
-
 **Software and Dependencies:**
 
 * Adafruit CircuitPython firmware for the supported boards:
   https://github.com/adafruit/circuitpython/releases
 
-.. todo:: Uncomment or remove the Bus Device and/or the Register library dependencies based on the library's use of either.
-
-# * Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
-# * Adafruit's Register library: https://github.com/adafruit/Adafruit_CircuitPython_Register
 """
 
 # imports
