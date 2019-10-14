@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-`adafruit_wsgi`
+`wsgi_app`
 ================================================================================
 
 CircuitPython framework for creating WSGI server compatible web applications.
