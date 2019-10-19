@@ -1,4 +1,3 @@
-import os
 import board
 import busio
 from digitalio import DigitalInOut
