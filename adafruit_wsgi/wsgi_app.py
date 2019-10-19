@@ -50,7 +50,7 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_WSGI.git"
 
 class WSGIApp:
     """
-    TODO
+    The base WSGI Application class.
     """
 
     def __init__(self):
