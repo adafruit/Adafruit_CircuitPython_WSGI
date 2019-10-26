@@ -54,26 +54,23 @@ wifi.connect()
 # wifi = wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
 # wifi.create_ap()
 
+# Here we create our application, registering the
+# following functions to be called on specific HTTP GET requests routes
 
-# Our HTTP Request handlers
+web_app = WSGIApp()
+
+@web_app.route('/led_on')
 def led_on(environ): # pylint: disable=unused-argument
     print("led on!")
     status_light.fill((0, 0, 100))
     return ("200 OK", [], "led on!")
 
+@web_app.route('/led_off')
 def led_off(environ): # pylint: disable=unused-argument
     print("led off!")
     status_light.fill(0)
     return ("200 OK", [], "led off!")
 
-
-# Here we create our application, registering the
-# above request_handlers for specific HTTP requests
-# we want to listen and respond to.
-
-web_app = WSGIApp()
-web_app.on_request("GET", "/led_on", led_on)
-web_app.on_request("GET", "/led_off", led_off)
 
 # Here we setup our server, passing in our web_app as the application
 server.set_interface(esp)

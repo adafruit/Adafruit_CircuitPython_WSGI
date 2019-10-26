@@ -91,5 +91,18 @@ class WSGIApp:
         """
         self._listeners[self._get_listener_key(method, path)] = request_handler
 
+    def route(self, rule, methods=None):
+        """
+        A decorator to register a route rule with an endpoint function.
+        if no methods are provided, default to GET
+        """
+        if not methods:
+            methods = ['GET']
+
+        def decorate(func):
+            for method in methods:
+                self._listeners[self._get_listener_key(method, rule)] = func
+        return decorate
+
     def _get_listener_key(self, method, path): # pylint: disable=no-self-use
         return "{0}|{1}".format(method.lower(), path)
