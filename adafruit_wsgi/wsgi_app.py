@@ -43,7 +43,7 @@ Implementation Notes
 
 """
 
-# imports
+import re
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_WSGI.git"
@@ -54,7 +54,8 @@ class WSGIApp:
     """
 
     def __init__(self):
-        self._listeners = {}
+        self._routes = []
+        self._variable_re = re.compile("<([a-zA-Z]*)>")
 
     def __call__(self, environ, start_response):
         """
@@ -68,14 +69,16 @@ class WSGIApp:
         headers = []
         resp_data = []
 
-        key = self._get_listener_key(environ["REQUEST_METHOD"].lower(), environ["PATH_INFO"])
-        if key in self._listeners:
-            status, headers, resp_data = self._listeners[key](environ)
+        match = self._match_route(environ["PATH_INFO"], environ["REQUEST_METHOD"].upper())
+
+        if match:
+            args, route = match
+            status, headers, resp_data = route["func"](environ, *args)
 
         start_response(status, headers)
         return resp_data
 
-    def on_request(self, method, path, request_handler):
+    def on_request(self, methods, rule, request_handler):
         """
         Register a Request Handler for a particular HTTP method and path.
         request_handler will be called whenever a matching HTTP request is received.
@@ -85,11 +88,22 @@ class WSGIApp:
         request_handler should return a tuple in the shape of:
             (status, header_list, data_iterable)
 
-        :param str method: the method of the HTTP request
-        :param str path: the path of the HTTP request
+        :param list methods: the methods of the HTTP request to handle
+        :param str rule: the path rule of the HTTP request
         :param func request_handler: the function to call
         """
-        self._listeners[self._get_listener_key(method, path)] = request_handler
+        regex = ""
+        rule_parts = rule.split("/")
+        for part in rule_parts:
+            var = self._variable_re.match(part)
+            if var:
+                # If named capture groups ever become a thing, use this regex instead
+                # regex += "(?P<" + var.group("var") + r">[a-zA-Z0-9_-]*)\/"
+                regex += r"([a-zA-Z0-9_-]*)\/"
+            else:
+                regex += part + r"\/"
+        regex += "?" # make last slash optional
+        self._routes.append((re.compile(regex), {"methods": methods, "func": request_handler}))
 
     def route(self, rule, methods=None):
         """
@@ -98,11 +112,13 @@ class WSGIApp:
         """
         if not methods:
             methods = ['GET']
-
         def decorate(func):
-            for method in methods:
-                self._listeners[self._get_listener_key(method, rule)] = func
+            self.on_request(methods, rule, func)
         return decorate
 
-    def _get_listener_key(self, method, path): # pylint: disable=no-self-use
-        return "{0}|{1}".format(method.lower(), path)
+    def _match_route(self, path, method):
+        for matcher, route in self._routes:
+            match = matcher.match(path)
+            if match and method in route["methods"]:
+                return (match.groups(), route)
+        return None
