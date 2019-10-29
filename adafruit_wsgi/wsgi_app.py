@@ -55,7 +55,7 @@ class WSGIApp:
 
     def __init__(self):
         self._routes = []
-        self._variable_re = re.compile("<([a-zA-Z]*)>")
+        self._variable_re = re.compile("^<([a-zA-Z]*)>$")
 
     def __call__(self, environ, start_response):
         """
@@ -92,17 +92,17 @@ class WSGIApp:
         :param str rule: the path rule of the HTTP request
         :param func request_handler: the function to call
         """
-        regex = ""
+        regex = "^"
         rule_parts = rule.split("/")
         for part in rule_parts:
             var = self._variable_re.match(part)
             if var:
                 # If named capture groups ever become a thing, use this regex instead
                 # regex += "(?P<" + var.group("var") + r">[a-zA-Z0-9_-]*)\/"
-                regex += r"([a-zA-Z0-9_-]*)\/"
+                regex += r"([a-zA-Z0-9_-]+)\/"
             else:
                 regex += part + r"\/"
-        regex += "?" # make last slash optional
+        regex += "?$" # make last slash optional and that we only allow full matches
         self._routes.append((re.compile(regex), {"methods": methods, "func": request_handler}))
 
     def route(self, rule, methods=None):
