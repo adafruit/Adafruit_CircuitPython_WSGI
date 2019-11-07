@@ -60,13 +60,13 @@ wifi.connect()
 web_app = WSGIApp()
 
 @web_app.route('/led_on/<r>/<g>/<b>')
-def led_on(environ, r, g, b): # pylint: disable=unused-argument
+def led_on(request, r, g, b): # pylint: disable=unused-argument
     print("led on!")
     status_light.fill((int(r), int(g), int(b)))
     return ("200 OK", [], "led on!")
 
 @web_app.route('/led_off')
-def led_off(environ): # pylint: disable=unused-argument
+def led_off(request): # pylint: disable=unused-argument
     print("led off!")
     status_light.fill(0)
     return ("200 OK", [], "led off!")

@@ -45,6 +45,8 @@ Implementation Notes
 
 import re
 
+from adafruit_wsgi.request import Request
+
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_WSGI.git"
 
@@ -55,7 +57,7 @@ class WSGIApp:
 
     def __init__(self):
         self._routes = []
-        self._variable_re = re.compile("^<([a-zA-Z]*)>$")
+        self._variable_re = re.compile("^<([a-zA-Z]+)>$")
 
     def __call__(self, environ, start_response):
         """
@@ -69,11 +71,13 @@ class WSGIApp:
         headers = []
         resp_data = []
 
-        match = self._match_route(environ["PATH_INFO"], environ["REQUEST_METHOD"].upper())
+        request = Request(environ)
+
+        match = self._match_route(request.path, request.method.upper())
 
         if match:
             args, route = match
-            status, headers, resp_data = route["func"](environ, *args)
+            status, headers, resp_data = route["func"](request, *args)
 
         start_response(status, headers)
         return resp_data
