@@ -35,26 +35,26 @@ class Request():
     A higher level abstraction of the raw WSGI Environ dictionary.
     """
     def __init__(self, environ):
-        self.method = environ["REQUEST_METHOD"]
-        self.path = environ["PATH_INFO"]
-        self.query_params = self.__parse_query_params(environ["QUERY_STRING"])
-        self.headers = self.__parse_headers(environ)
-        self.body = environ["wsgi.input"]
-        self.wsgi_environ = environ
+        self._method = environ["REQUEST_METHOD"]
+        self._path = environ["PATH_INFO"]
+        self._query_params = self.__parse_query_params(environ.get("QUERY_STRING", ""))
+        self._headers = self.__parse_headers(environ)
+        self._body = environ["wsgi.input"]
+        self._wsgi_environ = environ
 
     @property
     def method(self):
         """
         the HTTP Method Type of this request
         """
-        return self.method
+        return self._method
 
     @property
     def path(self):
         """
         the path this request was made to
         """
-        return self.full_path
+        return self._path
 
     @property
     def query_params(self):
@@ -62,7 +62,7 @@ class Request():
         Request query parameters, represented as a dictionary of
         param name to param value
         """
-        return self.query_params
+        return self._query_params
 
     @property
     def headers(self):
@@ -70,21 +70,21 @@ class Request():
         Request headers, represented as a dictionary of
         header name to header value
         """
-        return self.headers
+        return self._headers
 
     @property
     def body(self):
         """
         The Request Body
         """
-        return self.body
+        return self._body
 
     @property
     def wsgi_environ(self):
         """
         The raw WSGI Environment dictionary representation of the request
         """
-        return self.wsgi_environ
+        return self._wsgi_environ
 
     @staticmethod
     def __parse_query_params(query_string):
@@ -111,5 +111,5 @@ class Request():
         for key, val in environ.items():
             header = env_header_re.match(key)
             if header:
-                headers[header.replace("_","-").lower()] = val
+                headers[header.group(1).replace("_", "-").lower()] = val
         return headers
