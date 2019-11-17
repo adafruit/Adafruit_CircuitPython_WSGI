@@ -116,9 +116,7 @@ class WSGIApp:
         """
         if not methods:
             methods = ['GET']
-        def decorate(func):
-            self.on_request(methods, rule, func)
-        return decorate
+        return lambda func: self.on_request(methods, rule, func)
 
     def _match_route(self, path, method):
         for matcher, route in self._routes:
