@@ -9,8 +9,8 @@ Introduction
     :target: https://discord.gg/nBQh6qu
     :alt: Discord
 
-.. image:: https://travis-ci.com/adafruit/Adafruit_CircuitPython_WSGI.svg?branch=master
-    :target: https://travis-ci.com/adafruit/Adafruit_CircuitPython_WSGI
+.. image:: https://github.com/adafruit/Adafruit_CircuitPython_WSGI/workflows/Build%20CI/badge.svg
+    :target: https://github.com/adafruit/Adafruit_CircuitPython_WSGI/actions
     :alt: Build Status
 
 CircuitPython framework for creating WSGI compatible web server applications.
