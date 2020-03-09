@@ -29,11 +29,13 @@
 """
 import re
 
-class Request():
+
+class Request:
     """
     An incoming HTTP request.
     A higher level abstraction of the raw WSGI Environ dictionary.
     """
+
     def __init__(self, environ):
         self._method = environ["REQUEST_METHOD"]
         self._path = environ["PATH_INFO"]
@@ -107,7 +109,7 @@ class Request():
         if "CONTENT_LENGTH" in environ:
             headers["content-length"] = environ["CONTENT_LENGTH"]
 
-        env_header_re = re.compile(r'HTTP_(.+)')
+        env_header_re = re.compile(r"HTTP_(.+)")
         for key, val in environ.items():
             header = env_header_re.match(key)
             if header:
