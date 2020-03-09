@@ -50,6 +50,7 @@ from adafruit_wsgi.request import Request
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_WSGI.git"
 
+
 class WSGIApp:
     """
     The base WSGI Application class.
@@ -106,8 +107,10 @@ class WSGIApp:
                 regex += r"([a-zA-Z0-9_-]+)\/"
             else:
                 regex += part + r"\/"
-        regex += "?$" # make last slash optional and that we only allow full matches
-        self._routes.append((re.compile(regex), {"methods": methods, "func": request_handler}))
+        regex += "?$"  # make last slash optional and that we only allow full matches
+        self._routes.append(
+            (re.compile(regex), {"methods": methods, "func": request_handler})
+        )
 
     def route(self, rule, methods=None):
         """
@@ -115,7 +118,7 @@ class WSGIApp:
         if no methods are provided, default to GET
         """
         if not methods:
-            methods = ['GET']
+            methods = ["GET"]
         return lambda func: self.on_request(methods, rule, func)
 
     def _match_route(self, path, method):

@@ -32,16 +32,20 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 # esp32_reset = DigitalInOut(board.D5)
 
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset) # pylint: disable=line-too-long
+esp = adafruit_esp32spi.ESP_SPIcontrol(
+    spi, esp32_cs, esp32_ready, esp32_reset
+)  # pylint: disable=line-too-long
 
 """Use below for Most Boards"""
-status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2) # Uncomment for Most Boards
+status_light = neopixel.NeoPixel(
+    board.NEOPIXEL, 1, brightness=0.2
+)  # Uncomment for Most Boards
 """Uncomment below for ItsyBitsy M4"""
 # import adafruit_dotstar as dotstar
 # status_light = dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1, brightness=1)
 
 ## If you want to connect to wifi with secrets:
-wifi = wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light,debug=True)
+wifi = wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light, debug=True)
 wifi.connect()
 
 ## If you want to create a WIFI hotspot to connect to with secrets:
@@ -59,14 +63,16 @@ wifi.connect()
 
 web_app = WSGIApp()
 
-@web_app.route('/led_on/<r>/<g>/<b>')
-def led_on(request, r, g, b): # pylint: disable=unused-argument
+
+@web_app.route("/led_on/<r>/<g>/<b>")
+def led_on(request, r, g, b):  # pylint: disable=unused-argument
     print("led on!")
     status_light.fill((int(r), int(g), int(b)))
     return ("200 OK", [], "led on!")
 
-@web_app.route('/led_off')
-def led_off(request): # pylint: disable=unused-argument
+
+@web_app.route("/led_off")
+def led_off(request):  # pylint: disable=unused-argument
     print("led off!")
     status_light.fill(0)
     return ("200 OK", [], "led off!")
