@@ -11,6 +11,11 @@
 """
 import re
 
+try:
+    from typing import Dict
+except ImportError:
+    pass
+
 
 class Request:
     """
@@ -18,7 +23,7 @@ class Request:
     A higher level abstraction of the raw WSGI Environ dictionary.
     """
 
-    def __init__(self, environ):
+    def __init__(self, environ: Dict[str, str]) -> None:
         self._method = environ["REQUEST_METHOD"]
         self._path = environ["PATH_INFO"]
         self._query_params = self.__parse_query_params(environ.get("QUERY_STRING", ""))
@@ -27,21 +32,21 @@ class Request:
         self._wsgi_environ = environ
 
     @property
-    def method(self):
+    def method(self) -> str:
         """
         the HTTP Method Type of this request
         """
         return self._method
 
     @property
-    def path(self):
+    def path(self) -> str:
         """
         the path this request was made to
         """
         return self._path
 
     @property
-    def query_params(self):
+    def query_params(self) -> Dict[str, str]:
         """
         Request query parameters, represented as a dictionary of
         param name to param value
@@ -49,7 +54,7 @@ class Request:
         return self._query_params
 
     @property
-    def headers(self):
+    def headers(self) -> Dict[str, str]:
         """
         Request headers, represented as a dictionary of
         header name to header value
@@ -64,14 +69,14 @@ class Request:
         return self._body
 
     @property
-    def wsgi_environ(self):
+    def wsgi_environ(self) -> Dict[str, str]:
         """
         The raw WSGI Environment dictionary representation of the request
         """
         return self._wsgi_environ
 
     @staticmethod
-    def __parse_query_params(query_string):
+    def __parse_query_params(query_string: str) -> Dict[str, str]:
         param_list = query_string.split("&")
         params = {}
         for param in param_list:
@@ -81,7 +86,7 @@ class Request:
         return params
 
     @staticmethod
-    def __parse_headers(environ):
+    def __parse_headers(environ: Dict[str, str]) -> Dict[str, str]:
         headers = {}
 
         # Content Type and Content Length headers
