@@ -92,7 +92,7 @@ class WSGIApp:
             if var:
                 # If named capture groups ever become a thing, use this regex instead
                 # regex += "(?P<" + var.group("var") + r">[a-zA-Z0-9_-]*)\/"
-                regex += r"([a-zA-Z0-9_-]+)\/"
+                regex += r"([a-zA-Z0-9\._-]+)\/"
             else:
                 regex += part + r"\/"
         regex += "?$"  # make last slash optional and that we only allow full matches
