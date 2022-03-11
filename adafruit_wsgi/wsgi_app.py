@@ -68,10 +68,7 @@ class WSGIApp:
             args, route = match
             response_params = route["func"](request, *args)
             if (
-                not (
-                    isinstance(response_params, list)
-                    or isinstance(response_params, tuple)
-                )
+                not isinstance(response_params, (list, tuple))
                 or len(response_params) != 3
             ):
                 raise RuntimeError(
