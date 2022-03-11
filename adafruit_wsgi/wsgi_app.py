@@ -66,15 +66,20 @@ class WSGIApp:
 
         if match:
             args, route = match
-            try:
-                status, headers, resp_data = route["func"](request, *args)
-            except TypeError as err:
+            response_params = route["func"](request, *args)
+            if (
+                not (
+                    isinstance(response_params, list)
+                    or isinstance(response_params, tuple)
+                )
+                or len(response_params) != 3
+            ):
                 raise RuntimeError(
                     "Proper HTTP response return not given for request handler '{}'".format(
                         route["func"].__name__
                     )
-                ) from err
-
+                )
+            status, headers, resp_data = response_params
         start_response(status, headers)
         return resp_data
 
