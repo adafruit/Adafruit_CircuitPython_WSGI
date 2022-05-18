@@ -70,9 +70,7 @@ class WSGIApp:
                 status, headers, resp_data = route["func"](request, *args)
             except (ValueError, TypeError) as err:
                 raise RuntimeError(
-                    "Proper HTTP response return not given for request path '{}'".format(
-                        request.path
-                    )
+                    f"Proper HTTP response return not given for request handler for path '{request.path}'"
                 ) from err
         start_response(status, headers)
         return resp_data
