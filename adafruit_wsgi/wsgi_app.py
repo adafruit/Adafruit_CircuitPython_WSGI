@@ -71,7 +71,7 @@ class WSGIApp:
             except (ValueError, TypeError) as err:
                 raise RuntimeError(
                     "Proper HTTP response not returned by request handler for path "
-                    + "'{request.path}'"
+                    + f"'{request.path}'"
                 ) from err
         start_response(status, headers)
         return resp_data
