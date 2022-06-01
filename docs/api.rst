@@ -6,3 +6,6 @@
 
 .. automodule:: adafruit_wsgi.wsgi_app
    :members:
+   
+.. automodule:: adafruit_wsgi.request
+   :members:
