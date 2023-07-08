@@ -8,7 +8,7 @@ import neopixel
 
 from adafruit_esp32spi import adafruit_esp32spi
 import adafruit_esp32spi.adafruit_esp32spi_wifimanager as wifimanager
-import adafruit_esp32spi.adafruit_esp32spi_wsgiserver as server
+import adafruit_wsgi.esp32spi_wsgiserver as server
 from adafruit_wsgi.wsgi_app import WSGIApp
 
 # Get wifi details and more from a secrets.py file
