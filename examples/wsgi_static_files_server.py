@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import os
+from os import getenv
 import board
 import busio
 from digitalio import DigitalInOut
@@ -16,12 +17,9 @@ import adafruit_wsgi.esp32spi_wsgiserver as server
 # being copied to the root of the circuitpython filesystem.
 # This is where our static assets like html, js, and css live.
 
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
 
 try:
     import json as json_module
@@ -49,25 +47,23 @@ print("MAC addr:", [hex(i) for i in esp.MAC_address])
 print("MAC addr actual:", [hex(i) for i in esp.MAC_address_actual])
 
 # Use below for Most Boards
-status_light = neopixel.NeoPixel(
+status_pixel = neopixel.NeoPixel(
     board.NEOPIXEL, 1, brightness=0.2
 )  # Uncomment for Most Boards
 # Uncomment below for ItsyBitsy M4
 # import adafruit_dotstar as dotstar
-# status_light = dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1, brightness=1)
+# status_pixel = dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1, brightness=1)
 
-## If you want to connect to wifi with secrets:
-wifi = wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+## If you want to connect to wifi:
+wifi = wifimanager.WiFiManager(esp, ssid, password, status_pixel=status_pixel)
 wifi.connect()
 
-## If you want to create a WIFI hotspot to connect to with secrets:
-# secrets = {"ssid": "My ESP32 AP!", "password": "supersecret"}
-# wifi = wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+## If you want to create a WIFI hotspot to connect to:
+# wifi = wifimanager.WiFiManager(esp, "My ESP32 AP!", "supersecret", status_pixel=status_pixel)
 # wifi.create_ap()
 
-## To you want to create an un-protected WIFI hotspot to connect to with secrets:"
-# secrets = {"ssid": "My ESP32 AP!"}
-# wifi = wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
+## To you want to create an un-protected WIFI hotspot to connect to:"
+# wifi = wifimanager.WiFiManager(esp, "My ESP32 AP!", password=None, status_pixel=status_pixel)
 # wifi.create_ap()
 
 
@@ -181,13 +177,13 @@ class SimpleWSGIApplication:
 # Our HTTP Request handlers
 def led_on(environ):  # pylint: disable=unused-argument
     print("led on!")
-    status_light.fill((0, 0, 100))
+    status_pixel.fill((0, 0, 100))
     return web_app.serve_file("static/index.html")
 
 
 def led_off(environ):  # pylint: disable=unused-argument
     print("led off!")
-    status_light.fill(0)
+    status_pixel.fill(0)
     return web_app.serve_file("static/index.html")
 
 
@@ -195,7 +191,7 @@ def led_color(environ):  # pylint: disable=unused-argument
     json = json_module.loads(environ["wsgi.input"].getvalue())
     print(json)
     rgb_tuple = (json.get("r"), json.get("g"), json.get("b"))
-    status_light.fill(rgb_tuple)
+    status_pixel.fill(rgb_tuple)
     return ("200 OK", [], [])
 
 
