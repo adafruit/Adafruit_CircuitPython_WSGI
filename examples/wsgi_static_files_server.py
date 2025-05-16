@@ -4,13 +4,14 @@
 
 import os
 from os import getenv
+
+import adafruit_esp32spi.adafruit_esp32spi_wifimanager as wifimanager
 import board
 import busio
-from digitalio import DigitalInOut
 import neopixel
-
 from adafruit_esp32spi import adafruit_esp32spi
-import adafruit_esp32spi.adafruit_esp32spi_wifimanager as wifimanager
+from digitalio import DigitalInOut
+
 import adafruit_wsgi.esp32spi_wsgiserver as server
 
 # This example depends on the 'static' folder in the examples folder
@@ -39,17 +40,13 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 # esp32_reset = DigitalInOut(board.D5)
 
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-esp = adafruit_esp32spi.ESP_SPIcontrol(
-    spi, esp32_cs, esp32_ready, esp32_reset
-)  # pylint: disable=line-too-long
+esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 
 print("MAC addr:", [hex(i) for i in esp.MAC_address])
 print("MAC addr actual:", [hex(i) for i in esp.MAC_address_actual])
 
 # Use below for Most Boards
-status_pixel = neopixel.NeoPixel(
-    board.NEOPIXEL, 1, brightness=0.2
-)  # Uncomment for Most Boards
+status_pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)  # Uncomment for Most Boards
 # Uncomment below for ItsyBitsy M4
 # import adafruit_dotstar as dotstar
 # status_pixel = dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1, brightness=1)
@@ -99,21 +96,15 @@ class SimpleWSGIApplication:
         headers = []
         resp_data = []
 
-        key = self._get_listener_key(
-            environ["REQUEST_METHOD"].lower(), environ["PATH_INFO"]
-        )
+        key = self._get_listener_key(environ["REQUEST_METHOD"].lower(), environ["PATH_INFO"])
         if key in self._listeners:
             status, headers, resp_data = self._listeners[key](environ)
         if environ["REQUEST_METHOD"].lower() == "get" and self._static:
             path = environ["PATH_INFO"]
             if path in self._static_files:
-                status, headers, resp_data = self.serve_file(
-                    path, directory=self._static
-                )
+                status, headers, resp_data = self.serve_file(path, directory=self._static)
             elif path == "/" and self.INDEX in self._static_files:
-                status, headers, resp_data = self.serve_file(
-                    self.INDEX, directory=self._static
-                )
+                status, headers, resp_data = self.serve_file(self.INDEX, directory=self._static)
 
         self._start_response(status, headers)
         return resp_data
@@ -151,23 +142,23 @@ class SimpleWSGIApplication:
 
         return (status, headers, resp_iter())
 
-    def _log_environ(self, environ):  # pylint: disable=no-self-use
+    def _log_environ(self, environ):
         print("environ map:")
         for name, value in environ.items():
             print(name, value)
 
-    def _get_listener_key(self, method, path):  # pylint: disable=no-self-use
-        return "{0}|{1}".format(method.lower(), path)
+    def _get_listener_key(self, method, path):
+        return f"{method.lower()}|{path}"
 
-    def _get_content_type(self, file):  # pylint: disable=no-self-use
+    def _get_content_type(self, file):
         ext = file.split(".")[-1]
-        if ext in ("html", "htm"):
+        if ext in {"html", "htm"}:
             return "text/html"
         if ext == "js":
             return "application/javascript"
         if ext == "css":
             return "text/css"
-        if ext in ("jpg", "jpeg"):
+        if ext in {"jpg", "jpeg"}:
             return "image/jpeg"
         if ext == "png":
             return "image/png"
@@ -175,19 +166,19 @@ class SimpleWSGIApplication:
 
 
 # Our HTTP Request handlers
-def led_on(environ):  # pylint: disable=unused-argument
+def led_on(environ):
     print("led on!")
     status_pixel.fill((0, 0, 100))
     return web_app.serve_file("static/index.html")
 
 
-def led_off(environ):  # pylint: disable=unused-argument
+def led_off(environ):
     print("led off!")
     status_pixel.fill(0)
     return web_app.serve_file("static/index.html")
 
 
-def led_color(environ):  # pylint: disable=unused-argument
+def led_color(environ):
     json = json_module.loads(environ["wsgi.input"].getvalue())
     print(json)
     rgb_tuple = (json.get("r"), json.get("g"), json.get("b"))
@@ -203,19 +194,15 @@ try:
     static_files = os.listdir(static)
     if "index.html" not in static_files:
         raise RuntimeError(
-            """
+            f"""
             This example depends on an index.html, but it isn't present.
-            Please add it to the {0} directory""".format(
-                static
-            )
+            Please add it to the {static} directory"""
         )
 except OSError as e:
     raise RuntimeError(
-        """
+        f"""
         This example depends on a static asset directory.
-        Please create one named {0} in the root of the device filesystem.""".format(
-            static
-        )
+        Please create one named {static} in the root of the device filesystem."""
     ) from e
 
 web_app = SimpleWSGIApplication(static_dir=static)
