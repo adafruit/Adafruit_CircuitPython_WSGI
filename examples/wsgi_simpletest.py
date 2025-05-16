@@ -2,13 +2,14 @@
 # SPDX-License-Identifier: MIT
 
 from os import getenv
+
+import adafruit_esp32spi.adafruit_esp32spi_wifimanager as wifimanager
 import board
 import busio
-from digitalio import DigitalInOut
 import neopixel
-
 from adafruit_esp32spi import adafruit_esp32spi
-import adafruit_esp32spi.adafruit_esp32spi_wifimanager as wifimanager
+from digitalio import DigitalInOut
+
 import adafruit_wsgi.esp32spi_wsgiserver as server
 from adafruit_wsgi.wsgi_app import WSGIApp
 
@@ -33,22 +34,16 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 # esp32_reset = DigitalInOut(board.D5)
 
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-esp = adafruit_esp32spi.ESP_SPIcontrol(
-    spi, esp32_cs, esp32_ready, esp32_reset
-)  # pylint: disable=line-too-long
+esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 
 """Use below for Most Boards"""
-status_pixel = neopixel.NeoPixel(
-    board.NEOPIXEL, 1, brightness=0.2
-)  # Uncomment for Most Boards
+status_pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)  # Uncomment for Most Boards
 """Uncomment below for ItsyBitsy M4"""
 # import adafruit_dotstar as dotstar
 # status_pixel = dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1, brightness=1)
 
 ## If you want to connect to wifi:
-wifi = wifimanager.WiFiManager(
-    esp, ssid, password, status_pixel=status_pixel, debug=True
-)
+wifi = wifimanager.WiFiManager(esp, ssid, password, status_pixel=status_pixel, debug=True)
 wifi.connect()
 
 ## If you want to create a WIFI hotspot to connect to:
@@ -66,14 +61,14 @@ web_app = WSGIApp()
 
 
 @web_app.route("/led_on/<r>/<g>/<b>")
-def led_on(request, r, g, b):  # pylint: disable=unused-argument
+def led_on(request, r, g, b):
     print("led on!")
     status_pixel.fill((int(r), int(g), int(b)))
     return ("200 OK", [], "led on!")
 
 
 @web_app.route("/led_off")
-def led_off(request):  # pylint: disable=unused-argument
+def led_off(request):
     print("led off!")
     status_pixel.fill(0)
     return ("200 OK", [], "led off!")

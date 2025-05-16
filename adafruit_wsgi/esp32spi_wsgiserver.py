@@ -26,21 +26,20 @@ https://www.python.org/dev/peps/pep-0333/
 
 * Author(s): Matt Costi
 """
-# pylint: disable=no-name-in-module, protected-access
 
-import io
 import gc
+import io
 import time
 
-from micropython import const
 import adafruit_esp32spi.adafruit_esp32spi_socket as socket
+from micropython import const
 
-_the_interface = None  # pylint: disable=invalid-name
+_the_interface = None
 
 
 def set_interface(iface):
     """Helper to set the global internet interface"""
-    global _the_interface  # pylint: disable=global-statement, invalid-name
+    global _the_interface
     _the_interface = iface
     socket.set_interface(iface)
 
@@ -83,7 +82,6 @@ def socket_readline(_socket, eol=b"\r\n"):
     return firstline
 
 
-# pylint: disable=invalid-name
 class WSGIServer:
     """
     A simple server that implements the WSGI interface
@@ -109,7 +107,7 @@ class WSGIServer:
         _the_interface.start_server(self.port, self._server_sock._socknum)
         if self._debug:
             ip = _the_interface.pretty_ip(_the_interface.ip_address)
-            print("Server available at {0}:{1}".format(ip, self.port))
+            print(f"Server available at {ip}:{self.port}")
             print(
                 "Server status: ",
                 _the_interface.server_state(self._server_sock._socknum),
@@ -176,9 +174,7 @@ class WSGIServer:
                 # check for new client sock
                 if self._debug > 2:
                     print("checking for new client sock")
-                client_sock_num = _the_interface.socket_available(
-                    self._server_sock._socknum
-                )
+                client_sock_num = _the_interface.socket_available(self._server_sock._socknum)
                 sock = socket.socket(socknum=client_sock_num)
         else:
             print("Server has not been started, cannot check for clients!")
@@ -249,7 +245,7 @@ class WSGIServer:
         for name, value in headers.items():
             key = "HTTP_" + name.replace("-", "_").upper()
             if key in env:
-                value = "{0},{1}".format(env[key], value)
+                value = f"{env[key]},{value}"
             env[key] = value
 
         return env

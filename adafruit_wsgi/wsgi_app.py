@@ -101,9 +101,7 @@ class WSGIApp:
             else:
                 regex += part + r"\/"
         regex += "?$"  # make last slash optional and that we only allow full matches
-        self._routes.append(
-            (re.compile(regex), {"methods": methods, "func": request_handler})
-        )
+        self._routes.append((re.compile(regex), {"methods": methods, "func": request_handler}))
 
     def route(self, rule: str, methods: Optional[List[str]] = None):
         """
